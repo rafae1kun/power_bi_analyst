@@ -1,0 +1,42 @@
+Desafio de projeto DIO modulo 3
+
+Foi utilizado sql azure e não mysql pois não está mais gratuito como na época do curso.
+
+Foi corrijido os scripts de criação do banco de dados e de inserção no banco de dados.
+
+Mudado nomes de cabeçalhos e excluido aqueles que estão sem valor 
+
+alterado valores monetarios para decimal fixo
+
+aterado gerentes para super ssn 1
+
+endereço dividido em mais campos de planilha
+
+Mescla de consulta em employe e department
+
+colunas desnecessarias removidas
+
+usei uma view sql direto no banco para retonar os nomes dos gerentes usando 
+SELECT 
+    e.Ssn AS Employee_SSN,
+    CONCAT(e.Fname, ' ', e.Lname) AS Employee_Name,
+    e.Salary AS Employee_Salary,
+    e.Dno AS Department_Number,
+    CONCAT(m.Fname, ' ', m.Lname) AS Manager_Name
+FROM azure_company.employee e
+LEFT JOIN azure_company.employee m 
+    ON e.Super_ssn = m.Ssn;
+
+nome e sobrenome unidos na coluna nome completo
+
+departamento e local mesclados em nome e local
+
+Não podemos usar atribuir no exemplo pois afetaria a orientação dos dados e a natureza da relação entre eles
+
+considerando os gerentes por colaborador:
+Franklin Wong Total: 3 colaboradores
+James Borg Total: 2 colaboradores
+Jennifer Wallace Total: 2 colaboradores
+Sem Gerente Total: 1 colaborador
+
+colunas já removidas anteriomente
