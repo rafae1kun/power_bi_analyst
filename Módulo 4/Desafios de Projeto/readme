@@ -1,0 +1,56 @@
+# 📊 Desafio de Projeto: Modelagem Dimensional Star Schema no Power BI
+
+Este repositório contém a solução do desafio de projeto de modelagem de dados no Power BI, onde transformamos uma tabela única e desnormalizada (`Financial Sample`) em um modelo dimensional baseado no esquema em estrela (**Star Schema**).
+
+---
+
+## 🎯 Objetivo do Projeto
+
+O objetivo principal foi reestruturar a base de dados de origem para otimizar o desempenho de consultas, simplificar o desenvolvimento de análises visuais e organizar os dados em tabelas **Fato** e **Dimensão**, seguindo as melhores práticas de Business Intelligence e Modelagem Dimensional.
+
+---
+
+## 🛠️ Etapas do Processo de ETL e Construção
+
+O processo foi realizado no **Power Query Editor** e na exibição de **Modelagem em DAX** no Power BI Desktop:
+
+### 1. Preparação da Tabela Origem
+* **`financials_origem`**: A tabela original foi renomeada para ser utilizada como backup/referência no Power Query. A opção **Habilitar Carga** foi desativada para evitar duplicidade de dados e consumo desnecessário de memória no modelo.
+
+### 2. Criação das Tabelas Dimensão
+A partir de referências da tabela principal, foram construídas as tabelas dimensão:
+
+* **`D_Produtos`**:
+  * Criada via agrupamento por produto (`Product`).
+  * Inclui agregações como contagem de unidades, médias, mediana e valores mínimos/máximos de venda e manufatura.
+  * Adicionada coluna condicional para criação do índice numérico chave (`ID_Produto`).
+
+* **`D_Produtos_Detalhes`**:
+  * Contém informações detalhadas de cada produto (`Discount Band`, `Sale Price`, `Units Sold`, `Manufacturing Price`) vinculadas ao `ID_Produto`.
+
+* **`D_Descontos`**:
+  * Tabela focada nos dados de desconto (`Discount Band`, `Discounts`), relacionada à chave do produto.
+
+* **`D_Detalhes`**:
+  * Armazena informações complementares das transações não contempladas nas demais dimensões.
+
+### 3. Criação da Tabela Fato
+* **`F_Vendas`**:
+  * Tabela central do modelo contendo os fatos e métricas de negócios (vendas, custos, lucro e unidades vendidas).
+  * Inclusão da Chave Substituta (**`SK_ID`**) gerada via coluna de índice.
+  * Mapeamento da chave estrangeira **`ID_Produto`** para relacionamento com as tabelas dimensão.
+
+### 4. Criação da Tabela Dimensão Calendário (via DAX)
+* **`D_Calendario`**:
+  * Tabela de datas independente gerada com funções DAX para permitir inteligência temporal (Time Intelligence) no relatório.
+
+```dax
+D_Calendario = 
+ADDCOLUMNS (
+    CALENDAR(MIN(F_Vendas[Date]), MAX(F_Vendas[Date])),
+    "Ano", YEAR([Date]),
+    "Mês Número", MONTH([Date]),
+    "Nome do Mês", FORMAT([Date], "mmmm"),
+    "Trimestre", "Trim " & TRUNC((MONTH([Date]) - 1) / 3) + 1,
+    "Dia da Semana", FORMAT([Date], "dddd")
+)
